@@ -8,9 +8,48 @@ const objectConverter = require("../utils/objectConverter");
  */
 
 exports.findAllUsers = async (req, res) => {
+
+    /**
+     * Read the data from te query param
+     */
+    
+    const nameReq = req.query.name;
+    const userStatusReq = req.query.userStatus;
+    const userTypeReq = req.query.userType;
+    console.log(userStatusReq);
+
+    const mongoQueryObj = {};
+
+    if(nameReq && userStatusReq && userTypeReq) {
+        mongoQueryObj.name = nameReq;
+        mongoQueryObj.userStatus = userStatusReq;
+        mongoQueryObj.userType = userTypeReq;
+
+    } else if(userStatusReq && userTypeReq) {
+        mongoQueryObj.userStatus = userStatusReq;
+        mongoQueryObj.userType = userTypeReq;
+
+    } else if(nameReq && userStatusReq) {
+        mongoQueryObj.name = nameReq;
+        mongoQueryObj.userStatus = userStatusReq;
+
+    } else if(nameReq && userTypeReq) {
+        mongoQueryObj.name = nameReq;
+        mongoQueryObj.userType = userTypeReq;
+
+    } else if(nameReq) {
+        mongoQueryObj.name = nameReq;
+
+    } else if(userTypeReq) {
+        mongoQueryObj.userType = userTypeReq;
+
+    } else if(userStatusReq) {
+        mongoQueryObj.userStatus = userStatusReq;
+    }
+
     try {
-    const users = await Users.find();
-    // console.log(users);
+    const users = await Users.find(mongoQueryObj);
+    console.log(users);
     return res.status(200).send(objectConverter.userResponse(users));
 
    } catch(err) {
