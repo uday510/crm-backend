@@ -6,8 +6,6 @@ const userController = require("../controllers/user.controller");
 const {authJwt} = require("../middlewares");
 
 
-
-
 module.exports = (app) => {
 
     /**

@@ -105,7 +105,7 @@ exports.findAllUsers = async (req, res) => {
          
          res.status(200).send({
              message: "User record successfully updated"
-         })
+         });
      } catch (err) {
          console.log(err.message);
          res.status(500).send({

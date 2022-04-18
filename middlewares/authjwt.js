@@ -31,10 +31,11 @@ verifyToken = (req, res, next) => {
     //! If the token was provided, we need to verify it against
     jwt.verify(token, Config.secret, (err, decoded) =>{
         if(err) {
+            console.log("Token expiredAt", err.expiredAt);
             return res.status(401).send({
-                message: "Unauthorized"
+                message: "Token expired at " + err.expiredAt + ", please create new token"
             });
-        }
+        } 
         //! I will try to read the userId from the decoded token and store it in the req.userId property
         req.userId = decoded.id;
         next();
