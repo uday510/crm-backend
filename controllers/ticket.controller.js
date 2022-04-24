@@ -21,7 +21,7 @@ exports.createTicket = async (req, res) => {
     // console.log(ticketObj);
 
      /**
-     * If any Engineer is available
+     *? If any Engineer is available
      */
 
     try {
@@ -53,9 +53,9 @@ exports.createTicket = async (req, res) => {
             user.ticketsCreated.push(ticket._id);
             await user.save();
         }
-//         /**
-//          * Update the engineer
-//          */
+        /**
+         * Update the engineer
+         */
             engineer.ticketsAssigned.push(engineer._id);
             await engineer.save();
 
@@ -70,32 +70,6 @@ exports.createTicket = async (req, res) => {
     }
 }
 
-exports.getAllTickets = async (req, res) => {
-    const userId = req.userId;
-
-    const user = await User.findOne({userId: userId});
-
-    const ticketsCreated = user.ticketsCreated;
-
-    if(!ticketsCreated) {
-        return res.send(500).send({
-            message: "No Tickets Created "
-        })
-    }
-
-    const responseObj = [];
-
-    for(const ticket of ticketsCreated) {
-        responseObj.push(ticket);
-    }
-
-    return res.status(200).send({
-        message: "Successfully fetched tickets",
-        tickets: responseObj
-    });
-
-}
-
 /**
  * ! 16/04/2022
  * ! API to fetch all the tickets 
@@ -105,15 +79,16 @@ exports.getAllTickets = async (req, res) => {
 
     console.log(req.userId);
 
+    // const user = await User.findOne({userId: req.userId});
     const user = await User.findOne({userId: req.userId});
     // console.log(user);
-
+   
     if(user.ticketsCreated == null || user.ticketsCreated.length == 0) {
         return res.status(200).send({
             message: "No tickets were created by you !!!"
         });
     }
-    
+
     // const tickets = [];
     // var count = 0;
     // console.log(user.ticketsCreated);
@@ -127,64 +102,46 @@ exports.getAllTickets = async (req, res) => {
     //     }
     // });
 
+    console.log(req.query.status);
     const tickets = await Ticket.find({
         _id: {
             $in: user.ticketsCreated
-        }
+        },
+        status: req.query.status 
     });
     res.status(200).send(objectConverter.ticketListResponse(tickets));
 
 }
 
 /**
- * ! Controller to fetch ticket based on id
- */
+* ! Controller to fetch ticket based on id
+*/
 
 exports.getOneTicket = async (req, res) => {
     const ticket = await Ticket.findOne({
         _id: req.params.id
     });
-
-    return res.status(200).send(objectConverter.ticketResponse(ticket));
+    
+    res.status(200).send(objectConverter.ticketResponse(ticket));
 }
 
 /**
- * ! Controller to update the ticket
- */
+* ! Controller to update the ticket
+*/
 
 exports.updateTicket = async (req, res) => {
 
-    //! Check if the ticket exists
     const ticket = await Ticket.findOne({
         _id: req.params.id
-    });
-
-    if(ticket == null) {
-        return res.status(200).send({
-            message: "Ticked doesn't exists"
-        })
-    }
-
-    //! Update the attributes of the saved tickets
-      //! Only the ticket reporter/creator is able to update the ticket
-    
-      const user = await User.findOne({
-          userId: req.userId
-      });
-
-      if(!user.ticketsCreated.included(req.params.id)) {
-          return res.status(200).send({
-              message: "Only owner of the ticket is allowed to update."
-          });
-      }
+    }); 
 
     //! Update the attributes of the saved ticket
-
-    ticket.title = req.body.title != undefined ? req.body.title : ticket.title;
-    ticket.title = req.body.description != undefined ? req.body.description : ticket.description;
-    ticket.ticketPriority = req.body.ticketPriority != undefined ? req.body.ticketPriority : ticket.ticketPriority;
-    ticket.status = req.body.status != undefined ? req.body.status : ticket.status;
-
+    
+    ticket.title = req.body.title != undefined ? req.body.title: ticket.title;
+    ticket.description = req.body.description != undefined ? req.body.description: ticket.description;
+    ticket.ticketPriority = req.body.ticketPriority != undefined ? req.body.ticketPriority: ticket.ticketPriority;
+    ticket.status = req.body.status != undefined ? req.body.status: ticket.status;
+    
     //! Save the changed ticket
 
     const updatedTicket = await ticket.save();
@@ -192,4 +149,5 @@ exports.updateTicket = async (req, res) => {
     //! Return the updated ticket
 
     return res.status(200).send(objectConverter.ticketResponse(updatedTicket));
+
 }

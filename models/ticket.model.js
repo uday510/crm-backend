@@ -1,5 +1,5 @@
 /**
- * This file represents the schema for the ticket resource
+ *! This file represents the schema for the ticket resource
  */
 
 const mongoose = require('mongoose');
@@ -19,13 +19,13 @@ const ticketSchema = new mongoose.Schema({
         type: Number,
         required: true,
         default: constants.ticketPriority.four
-        //todo Possible values: 1/2/3/4
+        //! Possible values: 1/2/3/4
     },
     status: {
         type: String,
         required: true,
         default: constants.ticketStatus.open
-        //todo Possible values: "OPEN/CLOSED/BLOCKED"
+        //! Possible values: "OPEN/CLOSED/BLOCKED"
     },
     reporter: {
         type: String
