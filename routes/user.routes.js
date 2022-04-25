@@ -22,5 +22,5 @@ module.exports = (app) => {
     /**
      * ! PUT 127.0.0.1:4000/crm/api/v1/users/{userId}
      */
-    app.put("/crm/api/v1/users/:userId", [authJwt.verifyToken], userController.updateUser);
+    app.put("/crm/api/v1/users/:userId", [authJwt.verifyToken, authJwt.isAdmin], userController.updateUser);
 }

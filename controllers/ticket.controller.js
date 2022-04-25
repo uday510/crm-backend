@@ -73,22 +73,20 @@ exports.createTicket = async (req, res) => {
 /**
  * ! 16/04/2022
  * ! API to fetch all the tickets 
+ * 
+ * ! 20/04/2022
+ * ? Depending on the user I need to return different list of tickets.
+ * 
+ * ! 1. ADMIN - Return all tickets
+ * ! 2. ENGINEER - Return all the tickets, either created or assigned
+ * ! 3. CUSTOMER - RETURN all the tickets created.
  */
 
 exports.getAllTickets = async (req, res) => {
 
     console.log(req.userId);
 
-    // const user = await User.findOne({userId: req.userId});
-    const user = await User.findOne({userId: req.userId});
-    // console.log(user);
-   
-    if(user.ticketsCreated == null || user.ticketsCreated.length == 0) {
-        return res.status(200).send({
-            message: "No tickets were created by you !!!"
-        });
-    }
-
+    // console.log("user", user);
     // const tickets = [];
     // var count = 0;
     // console.log(user.ticketsCreated);
@@ -102,15 +100,45 @@ exports.getAllTickets = async (req, res) => {
     //     }
     // });
 
-    console.log(req.query.status);
-    const tickets = await Ticket.find({
-        _id: {
-            $in: user.ticketsCreated
-        },
-        status: req.query.status 
-    });
-    res.status(200).send(objectConverter.ticketListResponse(tickets));
+    // console.log(req.query.status);
 
+    const queryObj = {};
+    if(req.query.status != undefined) {
+        queryObj.status = req.query.status
+    }
+
+    const user = await User.findOne({userId: req.userId});
+    if(user.userType == constants.userTypes.admin) {
+        // Return all the users
+        // No need to change anything in the query object
+    } else if(user.userType == constants.userTypes.customer) {
+
+        if(user.ticketsCreated == null || user.ticketsCreated.length == 0) {
+            return res.status(200).send({
+                message: "No tickets created by you."
+            });
+        }
+        queryObj._id = {
+            $in: user.ticketsCreated // Array of tickets.
+        }
+    } else {
+         /** 
+          * ! User is of type engineer
+          * Approach 1: $or ---
+          *
+          * Approach 2: In the clause put both the lists
+          *         ticketsCreated
+          *         ticketsAssigned
+          */
+         queryObj._id = {
+             $in: user.ticketsCreated // Array of ticket ids
+         };
+         //! All the tickets where I am the assignee
+         queryObj.assignee = req.userId
+    }
+    const tickets = await Ticket.find(queryObj);
+
+    res.status(200).send(objectConverter.ticketListResponse(tickets));
 }
 
 /**
@@ -134,13 +162,33 @@ exports.updateTicket = async (req, res) => {
     const ticket = await Ticket.findOne({
         _id: req.params.id
     }); 
+    
+    const user = await User.findOne({
+        userId: req.userId
+    });
+
+      /**
+     * If the ticket is not assigned to any engineer, any engineer
+     * can self assign themselves the given ticket.
+     */
+
+    if(ticket.assignee == undefined) {
+        ticket.assignee = req.userId;
+    }
 
     //! Update the attributes of the saved ticket
-    
+
     ticket.title = req.body.title != undefined ? req.body.title: ticket.title;
     ticket.description = req.body.description != undefined ? req.body.description: ticket.description;
     ticket.ticketPriority = req.body.ticketPriority != undefined ? req.body.ticketPriority: ticket.ticketPriority;
     ticket.status = req.body.status != undefined ? req.body.status: ticket.status;
+
+    ticket.updatedAt = Date.now();
+    
+    //? Ability ot re-assign the ticket
+    if(user.userType == constants.userTypes.admin) {
+        ticket.assignee = req.body.assignee != undefined ? req.body.assignee: ticket.assignee;
+    }
     
     //! Save the changed ticket
 

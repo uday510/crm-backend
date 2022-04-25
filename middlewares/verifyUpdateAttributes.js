@@ -19,17 +19,22 @@ verifyUpdateAttributes = async (req, res, next) => {
 
     /**
     * ? Only the ticket created allowed to update the ticket.
+    * 
+    * ? 1. Check for ADMIN
+    * ? 2. Check for Engineer
     */
     const user = await User.findOne({
         userId: req.userId
     });
 
     console.log("user", user);
-    if(!user.ticketsCreated.includes(req.params.id)) {
-        return res.status(403).send({
-            message: "Only owner of the ticket allowed to update the ticket."
-        });
-    }
+    if(!user.ticketsCreated.includes(req.params.id) && 
+       !(user.userType == user.constants.admin) && 
+       !(ticket.assignee == req.userId)) {
+       return res.status(403).send({
+           message: "Only owner of the ticket allowed to update the ticket."
+       });
+    } 
     next();
 }
 
