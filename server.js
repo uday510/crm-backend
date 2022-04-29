@@ -13,8 +13,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect(dbConfig.DB_URL, () => {
      console.log(`Connecting to MongoDB...`);
-     console.log(`Connection successful`);
-     // Intialization
+     console.log(`Connection Successful`);
+     // Initialization
      init();
 });
 
