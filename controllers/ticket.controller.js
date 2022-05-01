@@ -1,7 +1,7 @@
 const User = require("../models/user.model");
 const constants = require("../utils/constants");
 const Ticket = require("../models/ticket.model");
-const notificationServiceClient = require("../utils/notificationServiceClient");
+const notificationServiceClient = require("../utils/NotificationServiceClient");
 
 const objectConverter = require("../utils/objectConverter");
 
@@ -36,6 +36,7 @@ exports.createTicket = async (req, res) => {
         }
 
         const ticket = await Ticket.create(ticketObj);
+        console.log(ticket);
 
          /**
           * Ticket is created now
@@ -46,17 +47,15 @@ exports.createTicket = async (req, res) => {
           */
 
         if(ticket) {
-            console.log("TICKET CREATED", ticket);
             const user = await User.findOne({
                 userId: req.userId
             });
-            console.log("user", user);
             user.ticketsCreated.push(ticket._id);
             await user.save();
         /**
          * Update the engineer
          */
-            engineer.ticketsAssigned.push(engineer._id);
+            engineer.ticketsAssigned.push(ticket._id);
             await engineer.save();
 
         /**
@@ -66,13 +65,13 @@ exports.createTicket = async (req, res) => {
          *! 
          *! I need to have a client to call the external service
          */
-        notificationServiceClient(ticket._id, "Created new ticket :" + ticket._id, ticket.description, user.email + "," + engineer.email, user.email);
+        notificationServiceClient.sendEmail(ticket._id, "Created new ticket :"+ticket._id,ticket.description, user.email+","+engineer.email,user.email);
 
         return res.status(201).send(objectConverter.ticketResponse(ticket));
     }
  } catch (err) {
 
-        console.log("Error", err.message);
+        console.log(err.message);
 
         return res.status(500).send({
             message: "Some internal error"
@@ -169,10 +168,13 @@ exports.getOneTicket = async (req, res) => {
 
 exports.updateTicket = async (req, res) => {
 
+    //check if the ticket exists
     const ticket = await Ticket.findOne({
         _id: req.params.id
     }); 
     
+    console.log(ticket);
+
     const user = await User.findOne({
         userId: req.userId
     });

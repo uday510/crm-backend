@@ -3,7 +3,9 @@
  */
 const Client = require("node-rest-client").Client;
 
-const client  = new Client();
+const client  = new Client(); //create new client
+
+exports.client = client;
 
 
 /**
@@ -19,7 +21,7 @@ const client  = new Client();
  * 
  */
 
-module.exports = (ticketId, subject, content, emailIds, requester) => {
+exports.sendEmail = (ticketId, subject, content, emailIds, requester) => {
 
     /**
      *! POST call
@@ -47,25 +49,11 @@ module.exports = (ticketId, subject, content, emailIds, requester) => {
         headers: headers
     }
 
-    var req = client.post("http://127.0.0.1:4001/notifServ/api/v1/notifications", args, (data, response) => {
+   client.post("http://127.0.0.1:4001/notifServ/api/v1/notifications", args, (data, response) => {
         console.log("Request sent");
-        console.log(`->>DATA<<- ${data}`);
-        
+        console.log(data);
     }); 
 
-    req.on('requestTimeout', function (req) {
-	console.log('request has expired');
-	req.abort();
-    });
-
-    req.on('responseTimeout', function (res) {
-    	console.log('response has expired');
-
-    });
-
-    req.on('error', function (err) {
-    	console.log('request error', err);
-    });
 
 }
 
