@@ -1,5 +1,6 @@
 const Ticket = require("../models/ticket.model");
 const User = require("../models/user.model");
+const constants = require("../utils/constants");
 
 verifyUpdateAttributes = async (req, res, next) => { 
 
@@ -29,7 +30,7 @@ verifyUpdateAttributes = async (req, res, next) => {
 
     console.log("user", user);
     if(!user.ticketsCreated.includes(req.params.id) && 
-       !(user.userType == user.constants.admin) && 
+       !(user.userType == constants.userTypes.admin) && 
        !(ticket.assignee == req.userId)) {
        return res.status(403).send({
            message: "Only owner of the ticket allowed to update the ticket."

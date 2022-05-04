@@ -9,6 +9,6 @@ module.exports = (app) => {
 
     app.get("/crm/api/v1/tickets/:id", [authJwt.verifyToken], ticketController.getOneTicket);
 
-    app.put("/crm/api/v1/tickets/update/:id", [authJwt.verifyToken, verifyAttributes.verifyUpdateAttributes],  ticketController.updateTicket);
+    app.put("/crm/api/v1/tickets/:id", [authJwt.verifyToken, verifyAttributes.verifyUpdateAttributes],  ticketController.updateTicket);
 }
 
