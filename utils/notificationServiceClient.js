@@ -7,7 +7,6 @@ const client  = new Client(); //create new client
 
 exports.client = client;
 
-
 /**
  * Expose a function which will take the following information
  * 
@@ -26,11 +25,12 @@ exports.sendEmail = (ticketId, subject, content, emailIds, requester) => {
     /**
      *! POST call
      *! 
-     *!      - URI: 127.0.0.1:4001/notifServ/api/v1/notifications
+     *!      - URI: 127.0.0.1:4001/notifyService/api/v1/notifications
      *!      - HTTP Verb: POST
      *!      - Request Body
      *!      - Headers
      */
+
     //? Request body
     const reqBody = {
         subject: subject,
@@ -53,7 +53,6 @@ exports.sendEmail = (ticketId, subject, content, emailIds, requester) => {
         console.log("Request sent");
         console.log(data);
     }); 
-
 
 }
 

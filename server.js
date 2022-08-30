@@ -14,18 +14,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect(dbConfig.DB_URL, () => {
      console.log(`Connecting to MongoDB...`);
      console.log(`Connection Successful`);
-     // Initialization
+
      init();
 });
 
 const init = async () => {
 
-     var user = await User.findOne({userId: "admin"});
+     var user = await User.find({type: "admin"});
 
      if(user) {
           return;
      }
-     //Create the admin Role
+
+     console.log(`Creating Admin Role...`);
      user = await User.create({
           name: "Uday",
           userId: "admin",
@@ -38,8 +39,9 @@ const init = async () => {
 
 require("./routes/auth.routes")(app);
 require("./routes/user.routes")(app);
-require("./routes/ticket.routes")(app);
+
 
 module.exports = app.listen(serverConfig.PORT, () => {
-     console.log(`App listening on port ${serverConfig.PORT}`)
+     console.log(`Crm App listening on port ${serverConfig.PORT}`)
 });
+

@@ -44,7 +44,7 @@ exports.ticketListResponse = (tickets) => {
             id: ticket._id,
             createdAt: ticket.createdAt,
             updatedAt: ticket.updatedAt 
-       }) ;   
+       });   
     });
     return ticketResult;
 }

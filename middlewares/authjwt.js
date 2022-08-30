@@ -51,8 +51,12 @@ isAdmin = async (req, res, next) => {
     /**
      * Check the userType
      */
-
-    if(user && user.userType == Constants.userTypes.admin)
+    if(!user) {
+         return res.status(403).send({
+            message: "No user Found"
+        });
+    }
+    else if(user && user.userType == Constants.userTypes.admin)
         next();
     else {
         return res.status(403).send({
